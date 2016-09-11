@@ -1,0 +1,14 @@
+---
+- name: Docker
+  hosts: all
+  #pre_tasks:
+  #- name: Install python
+    #raw: python --version || apt-get update && apt-get install -y python python-pip && pip install docker-py
+  tasks:
+  - name: Hello world from docker
+    docker_container:
+      name: hello
+      image: kitematic/hello-world-nginx
+      state: started
+      ports:
+      - "80:80"
