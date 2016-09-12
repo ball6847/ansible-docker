@@ -1,8 +1,8 @@
 - name: prerequisites
   hosts: all
   tasks:
-  - name: checking pip
+  - name: pip
     package: name=python-pip state=present use=auto
-  - name: checking docker-py
+  - name: docker-py
     pip: name=docker-py version=1.8.1 state=present
 
