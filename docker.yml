@@ -1,0 +1,10 @@
+- name: hello world from docker
+  hosts: all
+  tasks:
+  - name: start container
+    docker_container:
+      name: hello
+      image: kitematic/hello-world-nginx
+      state: started
+      ports:
+      - "80:80"
