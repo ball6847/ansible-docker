@@ -1,3 +1,5 @@
+- include: python+docker.yml
+
 - name: prerequisites
   hosts: all
   tasks:

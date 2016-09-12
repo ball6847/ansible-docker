@@ -1,0 +1,9 @@
+- name: install python
+  hosts: all
+  gather_facts: no
+  tasks:
+  - name: python
+    raw: which python || apt-get install -y python
+  - name: docker
+    raw: which docker || (wget -qO- https://get.docker.com | sh)
+
