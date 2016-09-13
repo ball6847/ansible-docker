@@ -1,43 +1,41 @@
+- include: prerequisites.yml
+
+# @TODO: need to block untill service is up
 - name: docker gluster
   hosts: gluster
   tasks:
   - name: start container
-    docker_container:
+    docker:
       name: gluster
-      hostname: gluster
-      state: started
+      state: reloaded
       image: million12/gluster
       privileged: true
-      etc_hosts:
-        node1: 192.168.56.101
-        node2: 192.168.56.102
-      ports:
-      - "24007:24007"
-      - "24008:24008"
-      - "49152:49152"
+      net: host
+      devices:
+      - /dev/fuse
       volumes:
-      - /volume/gluster:/gluster
-      - /volume/var/lib/glusterd:/var/lib/glusterd
+      - /opt/gluster/volumes:/gluster
+      #- /opt/gluster/mount:/mnt
+      - /opt/gluster/conf:/var/lib/glusterd
       env:
         TERM: xterm-256color
         TZ: Asia/Bangkok
-  #- name: peer all nodes
-    #debug: msg={{ hostvars[item]['ansible_enp0s3']['ipv4']['address'] }}
-    #with_items:
-      #- "{{ groups['gluster'] }}"
-    #script: scripts/gluster_peers.sh
 
+# Loop over gluster nodes, add them to peers and add-brick to volume
 - name: docker gluster (master)
   hosts: gluster-master
   tasks:
   - name: configure master node
     script: >
       scripts/gluster_configure_master.sh \
-        {{ inventory_hostname }} \
-        {{ hostvars }}
+        {{ hostvars[inventory_hostname]['ansible_enp0s3']['ipv4']['address'] }} \
+        {{ hostvars[item]['ansible_enp0s3']['ipv4']['address'] }}
     with_items:
-      - "{{ groups['gluster-slave'] }}"
-    register: 'r'
-  - debug: var=r
-  - debug: msg={{ item }}
-    with_items: "{{ r.results }}"
+      - "{{ groups['gluster-nodes'] }}"
+
+# mount volume on all nodes
+- name: mount gluster volume
+  hosts: gluster
+  tasks:
+  - name: mount gluster volume
+    script: scripts/gluster_mount_volume.sh
