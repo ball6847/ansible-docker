@@ -15,11 +15,11 @@
       - /dev/fuse
       volumes:
       - /opt/gluster/volumes:/gluster
-      #- /opt/gluster/mount:/mnt
       - /opt/gluster/conf:/var/lib/glusterd
       env:
         TERM: xterm-256color
         TZ: Asia/Bangkok
+  - wait_for: port=24007 delay=3
 
 # Loop over gluster nodes, add them to peers and add-brick to volume
 - name: docker gluster (master)
@@ -34,8 +34,8 @@
       - "{{ groups['gluster-nodes'] }}"
 
 # mount volume on all nodes
-- name: mount gluster volume
-  hosts: gluster
-  tasks:
-  - name: mount gluster volume
-    script: scripts/gluster_mount_volume.sh
+#- name: mount gluster volume
+  #hosts: gluster
+  #tasks:
+  #- name: mount gluster volume
+    #script: scripts/gluster_mount_volume.sh
